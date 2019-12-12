@@ -2320,6 +2320,7 @@ class MaskRCNN():
             # All layers
             "all": ".*",
         }
+        print(layer_regex)
         if layers in layer_regex.keys():
             layers = layer_regex[layers]
             print(layers)
