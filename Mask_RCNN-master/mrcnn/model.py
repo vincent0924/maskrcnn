@@ -2310,7 +2310,7 @@ class MaskRCNN():
             defined in the Dataset class.
         """
         assert self.mode == "training", "Create model in training mode."
-        print('i am here....\n\n\n')
+        # print('i am here....\n')
 
         # Pre-defined layer regular expressions
         layer_regex = {
@@ -2323,7 +2323,7 @@ class MaskRCNN():
             # All layers
             "all": ".*",
         }
-        print(layer_regex)
+        # print(layer_regex)
         if layers in layer_regex.keys():
             layers = layer_regex[layers]
             print(layers)
