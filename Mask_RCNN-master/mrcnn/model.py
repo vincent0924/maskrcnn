@@ -2152,6 +2152,7 @@ class MaskRCNN():
                                 md5_hash='a268eb855778b3df3c7506639542a6af')
         return weights_path
 
+
     def compile(self, learning_rate, momentum):
         """Gets the model ready for training. Adds losses, regularization, and
         metrics. Then calls the Keras compile() function.
@@ -2364,7 +2365,8 @@ class MaskRCNN():
         if os.name is 'nt':
             workers = 0
         else:
-            workers = multiprocessing.cpu_count()
+            workers = max(self.config.BATCH_SIZE // 2, 2)
+            # workers = multiprocessing.cpu_count()
 
         self.keras_model.fit_generator(
             train_generator,
@@ -2375,8 +2377,8 @@ class MaskRCNN():
             validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
-            workers=workers,
-            use_multiprocessing=True,
+            workers=1, # workers=workers
+            use_multiprocessing=False, #use_multiprocessing=True
         )
         self.epoch = max(self.epoch, epochs)
 
