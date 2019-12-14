@@ -2170,13 +2170,12 @@ class MaskRCNN():
             "mrcnn_class_loss", "mrcnn_bbox_loss", "mrcnn_mask_loss"]
         for name in loss_names:
             layer = self.keras_model.get_layer(name)
-            @tf.function
             if layer.output in self.keras_model.losses:
                 continue
             loss = (
                 tf.reduce_mean(layer.output, keepdims=True)
                 * self.config.LOSS_WEIGHTS.get(name, 1.))
-            self.keras_model.add_loss(lambda: loss)
+            self.keras_model.add_loss(loss)
 
         # Add L2 Regularization
         # Skip gamma and beta weights of batch normalization layers.
@@ -2184,7 +2183,7 @@ class MaskRCNN():
             keras.regularizers.l2(self.config.WEIGHT_DECAY)(w) / tf.cast(tf.size(w), tf.float32)
             for w in self.keras_model.trainable_weights
             if 'gamma' not in w.name and 'beta' not in w.name]
-        self.keras_model.add_loss(lambda: tf.add_n(reg_losses))
+        self.keras_model.add_loss(tf.add_n(reg_losses))
 
         # Compile
         self.keras_model.compile(
@@ -2366,8 +2365,8 @@ class MaskRCNN():
         if os.name is 'nt':
             workers = 0
         else:
-            workers = max(self.config.BATCH_SIZE // 2, 2)
-            # workers = multiprocessing.cpu_count()
+            #workers = max(self.config.BATCH_SIZE // 2, 2)
+             workers = multiprocessing.cpu_count()
 
         self.keras_model.fit_generator(
             train_generator,
@@ -2375,11 +2374,11 @@ class MaskRCNN():
             epochs=epochs,
             steps_per_epoch=self.config.STEPS_PER_EPOCH,
             callbacks=callbacks,
-            validation_data=val_generator,
+            validation_data=val_generator, #validation_data=next(val_generator)
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
-            workers=1, # workers=workers
-            use_multiprocessing=False, #use_multiprocessing=True
+            workers=workers, # workers=1
+            use_multiprocessing=True, #use_multiprocessing=True
         )
         self.epoch = max(self.epoch, epochs)
 
