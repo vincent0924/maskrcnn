@@ -2170,6 +2170,7 @@ class MaskRCNN():
             "mrcnn_class_loss", "mrcnn_bbox_loss", "mrcnn_mask_loss"]
         for name in loss_names:
             layer = self.keras_model.get_layer(name)
+            @tf.function
             if layer.output in self.keras_model.losses:
                 continue
             loss = (
