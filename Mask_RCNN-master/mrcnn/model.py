@@ -2176,7 +2176,7 @@ class MaskRCNN():
             loss = (
                 tf.reduce_mean(layer.output, keepdims=True)
                 * self.config.LOSS_WEIGHTS.get(name, 1.))
-            self.keras_model.add_loss(Lambda:loss)
+            self.keras_model.add_loss(loss)
 
         # Add L2 Regularization
         # Skip gamma and beta weights of batch normalization layers.
@@ -2196,11 +2196,13 @@ class MaskRCNN():
             if name in self.keras_model.metrics_names:
                 continue
             layer = self.keras_model.get_layer(name)
-            self.keras_model.metrics_names.append(name)
+            self.keras_model._compile_metrics_names.append(name)
+            # self.keras_model.metrics_names.append(name)
             loss = (
                 tf.reduce_mean(layer.output, keepdims=True)
                 * self.config.LOSS_WEIGHTS.get(name, 1.))
-            self.keras_model.metrics_tensors.append(loss)
+            # self.keras_model.metrics_tensors.append(loss)
+            self.keras_model._compile_stateful_metrics_tensors[name]=loss
 
     def set_trainable(self, layer_regex, keras_model=None, indent=0, verbose=1):
         """Sets model layers as trainable if their names match
